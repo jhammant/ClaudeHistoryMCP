@@ -8,7 +8,7 @@ import { CONFIG } from "../config.js";
 
 export interface KnowledgeEntry {
   id: string;
-  type: "decision" | "solution" | "error_fix" | "pattern";
+  type: "decision" | "solution" | "error_fix" | "pattern" | "learning";
   project: string;
   sessionId: string;
   timestamp: number;
@@ -16,6 +16,10 @@ export interface KnowledgeEntry {
   details: string;
   tags: string[];
   relatedFiles: string[];
+  /** For learnings: how many source entries contributed */
+  occurrences?: number;
+  /** For learnings: number of distinct projects */
+  projectCount?: number;
 }
 
 export class KnowledgeStore {
@@ -99,7 +103,35 @@ export class KnowledgeStore {
     }
   }
 
+  /**
+   * Check if an entry with the given ID already exists.
+   */
+  hasEntry(id: string): boolean {
+    return this.entries.some((e) => e.id === id);
+  }
+
+  /**
+   * Get all learning entries, optionally filtered by project.
+   */
+  getGlobalLearnings(project?: string): KnowledgeEntry[] {
+    return this.entries
+      .filter((e) => {
+        if (e.type !== "learning") return false;
+        if (project && !e.project.toLowerCase().includes(project.toLowerCase()))
+          return false;
+        return true;
+      })
+      .sort((a, b) => (b.occurrences ?? 0) - (a.occurrences ?? 0));
+  }
+
   getEntryCount(): number {
     return this.entries.length;
+  }
+
+  /**
+   * Get all entries (read-only snapshot).
+   */
+  getAllEntries(): readonly KnowledgeEntry[] {
+    return this.entries;
   }
 }

@@ -14,6 +14,8 @@ import {
   summarizeSession,
   cacheSummary,
 } from "../knowledge/session-summarizer.js";
+import { synthesizeLearnings } from "../knowledge/learning-synthesizer.js";
+import { writeLearningsToMemory } from "../knowledge/memory-writer.js";
 import { FileWatcher } from "./file-watcher.js";
 
 export class IncrementalIndexer {
@@ -80,6 +82,16 @@ export class IncrementalIndexer {
         }
         if (knowledge.length > 0) {
           this.knowledgeStore.save();
+
+          // Run synthesis after new knowledge is extracted
+          const newLearnings = synthesizeLearnings(this.knowledgeStore);
+          if (newLearnings.length > 0) {
+            this.knowledgeStore.save();
+            // Write learnings to the project's MEMORY.md
+            const projectLearnings =
+              this.knowledgeStore.getGlobalLearnings(projectDir);
+            writeLearningsToMemory(projectDir, projectLearnings);
+          }
         }
 
         // Cache summary

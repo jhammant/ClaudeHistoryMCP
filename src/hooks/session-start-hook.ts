@@ -15,6 +15,7 @@ import { encodeProjectPath, extractProjectName } from "../utils/path-encoder.js"
 import { CONFIG } from "../config.js";
 import type { SessionSummary } from "../knowledge/session-summarizer.js";
 import type { KnowledgeEntry } from "../knowledge/knowledge-store.js";
+import type { RecurringIssue } from "../knowledge/learning-synthesizer.js";
 
 function main(): void {
   const cwd = process.cwd();
@@ -24,9 +25,15 @@ function main(): void {
   // Load recent summaries for this project
   const summaries = loadProjectSummaries(projectDir);
   const knowledge = loadProjectKnowledge(projectDir);
+  const globalLearnings = loadLearnings(projectDir);
+  const recurringIssue = loadTopRecurringIssue();
 
-  if (summaries.length === 0 && knowledge.length === 0) {
-    // No context to inject
+  if (
+    summaries.length === 0 &&
+    knowledge.length === 0 &&
+    globalLearnings.length === 0 &&
+    !recurringIssue
+  ) {
     return;
   }
 
@@ -63,6 +70,18 @@ function main(): void {
   const errorFixes = knowledge.filter((k) => k.type === "error_fix").slice(0, 1);
   for (const ef of errorFixes) {
     lines.push(`- Error fix: ${ef.summary}`);
+  }
+
+  // Show synthesized learnings (max 3)
+  for (const l of globalLearnings.slice(0, 3)) {
+    lines.push(`- Learning: ${l.summary}`);
+  }
+
+  // Show top recurring issue
+  if (recurringIssue) {
+    lines.push(
+      `- Recurring: ${recurringIssue.tag} issues (${recurringIssue.count} occurrences)`
+    );
   }
 
   if (lines.length > 1) {
@@ -106,11 +125,46 @@ function loadProjectKnowledge(projectDir: string): KnowledgeEntry[] {
     return entries
       .filter(
         (e) =>
-          e.project === projectDir || e.project.includes(projectDir)
+          e.type !== "learning" &&
+          (e.project === projectDir || e.project.includes(projectDir))
       )
       .sort((a, b) => b.timestamp - a.timestamp);
   } catch {
     return [];
+  }
+}
+
+function loadLearnings(projectDir: string): KnowledgeEntry[] {
+  if (!existsSync(CONFIG.knowledgeFile)) return [];
+
+  try {
+    const entries = JSON.parse(
+      readFileSync(CONFIG.knowledgeFile, "utf-8")
+    ) as KnowledgeEntry[];
+    return entries
+      .filter(
+        (e) =>
+          e.type === "learning" &&
+          (e.project === "_global" ||
+            e.project === projectDir ||
+            e.project.includes(projectDir))
+      )
+      .sort((a, b) => (b.occurrences ?? 0) - (a.occurrences ?? 0));
+  } catch {
+    return [];
+  }
+}
+
+function loadTopRecurringIssue(): RecurringIssue | null {
+  if (!existsSync(CONFIG.recurringIssuesFile)) return null;
+
+  try {
+    const issues = JSON.parse(
+      readFileSync(CONFIG.recurringIssuesFile, "utf-8")
+    ) as RecurringIssue[];
+    return issues.length > 0 ? issues[0] : null;
+  } catch {
+    return null;
   }
 }
 

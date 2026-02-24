@@ -8,6 +8,8 @@
 import { IndexManager } from "../indexing/index-manager.js";
 import { enumerateSessionFiles } from "../parsers/session-parser.js";
 import { KnowledgeStore } from "../knowledge/knowledge-store.js";
+import { synthesizeLearnings } from "../knowledge/learning-synthesizer.js";
+import { writeLearningsToMemory } from "../knowledge/memory-writer.js";
 
 async function main(): Promise<void> {
   console.log("Claude History MCP — Building Index\n");
@@ -38,6 +40,30 @@ async function main(): Promise<void> {
   console.log(`  Sessions: ${indexStats.sessions}`);
   console.log(`  Projects: ${indexStats.projects}`);
   console.log(`  Vocabulary: ${indexStats.vocabulary} terms`);
+
+  // Synthesize learnings from knowledge store
+  const knowledgeStore = new KnowledgeStore();
+  knowledgeStore.load();
+
+  if (knowledgeStore.getEntryCount() > 0) {
+    console.log("\nSynthesizing learnings...");
+    const newLearnings = synthesizeLearnings(knowledgeStore);
+    if (newLearnings.length > 0) {
+      knowledgeStore.save();
+      console.log(`  Created ${newLearnings.length} new learning(s)`);
+
+      // Write learnings to each project's MEMORY.md
+      for (const projectDir of projects) {
+        const projectLearnings = knowledgeStore.getGlobalLearnings(projectDir);
+        if (projectLearnings.length > 0) {
+          writeLearningsToMemory(projectDir, projectLearnings);
+        }
+      }
+      console.log(`  Updated MEMORY.md for ${projects.size} project(s)`);
+    } else {
+      console.log("  No new learnings to synthesize");
+    }
+  }
 
   console.log("\nDone! Index saved to ~/.claude-history-mcp/");
 }

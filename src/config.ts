@@ -26,6 +26,9 @@ export const CONFIG = {
   get metaFile() {
     return join(this.dataDir, "meta.json");
   },
+  get recurringIssuesFile() {
+    return join(this.dataDir, "recurring-issues.json");
+  },
 
   // BM25 parameters
   bm25: {
@@ -63,5 +66,14 @@ export const CONFIG = {
   watcher: {
     debounceMs: 5000,
     staleSessionMinutes: 5,
+  },
+
+  // Learning synthesis
+  learning: {
+    similarityThreshold: 0.6,  // Jaccard similarity for clustering
+    promotionThreshold: 10,    // Minimum score to promote to learning
+    maxLearningsPerProject: 10,
+    maxLearningLength: 120,    // Max chars per learning summary
+    memoryLineBudget: 200,     // Max lines in MEMORY.md
   },
 } as const;
