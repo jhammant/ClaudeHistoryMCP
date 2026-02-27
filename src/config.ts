@@ -68,6 +68,16 @@ export const CONFIG = {
     staleSessionMinutes: 5,
   },
 
+  // Cloud sync
+  cloud: {
+    apiUrl: process.env.CLAUDE_HISTORY_API_URL || "",
+    apiKey: process.env.CLAUDE_HISTORY_API_KEY || "",
+    teamId: process.env.CLAUDE_HISTORY_TEAM_ID || "",
+  },
+  get syncStateFile() {
+    return join(this.dataDir, "sync-state.json");
+  },
+
   // Learning synthesis
   learning: {
     similarityThreshold: 0.6,  // Jaccard similarity for clustering

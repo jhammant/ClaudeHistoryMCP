@@ -14,6 +14,9 @@ Claude Code stores full conversation transcripts as JSONL files in `~/.claude/pr
 | `list_projects` | List all projects with session counts and dates |
 | `find_patterns` | Discover recurring topics, workflows, and issues |
 | `get_project_context` | Full project context (recent sessions, decisions, knowledge) |
+| `cloud_sync_push` | Push knowledge and sessions to cloud server |
+| `cloud_sync_pull` | Pull knowledge and sessions from cloud server |
+| `cloud_sync_status` | Check cloud sync configuration and connection |
 
 ### Key features
 
@@ -120,6 +123,18 @@ When the `claude-history` MCP is available, use it proactively:
 
 Without this, Claude has access to the tools but may not always think to reach for them.
 
+### 5. Configure cloud sync (optional)
+
+To sync knowledge across devices or share with a team, set up [ClaudeHistory Cloud](https://github.com/jhammant/claude-history-cloud):
+
+```bash
+export CLAUDE_HISTORY_API_URL=https://your-server.com
+export CLAUDE_HISTORY_API_KEY=your-api-key
+export CLAUDE_HISTORY_TEAM_ID=optional-team-uuid  # for team sync
+```
+
+Then use the `cloud_sync_push` and `cloud_sync_pull` tools to sync.
+
 ## Usage
 
 ### Via MCP tools (automatic)
@@ -193,6 +208,9 @@ src/
     knowledge-store.ts        # Persist extracted knowledge entries
     session-summarizer.ts     # Generate session summaries (heuristic, no LLM)
     knowledge-extractor.ts    # Extract decisions, solutions, error fixes
+  sync/
+    cloud-client.ts           # HTTP client for ClaudeHistory Cloud API
+    sync-state.ts             # Track last sync timestamps
   watcher/
     file-watcher.ts           # Debounced fs.watch on conversation files
     incremental-indexer.ts    # Diff mtimes, re-index only changed files
@@ -208,7 +226,7 @@ src/
     install.ts                # Install hook + skill
 commands/
   claude-history.md           # /claude-history skill definition
-tests/                        # Unit + integration tests (44 tests)
+tests/                        # Unit + integration tests (82 tests)
 ```
 
 ## Dependencies
