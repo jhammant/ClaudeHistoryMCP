@@ -3,6 +3,28 @@
   "version": "0.1.0",
   "description": "MCP server for searching and surfacing Claude Code conversation history",
   "type": "module",
+  "license": "MIT",
+  "author": "Jon Hammant",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhammant/ClaudeHistoryMCP.git"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "history",
+    "search",
+    "claude-code",
+    "model-context-protocol"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist/",
+    "commands/",
+    "README.md"
+  ],
   "main": "dist/index.js",
   "bin": {
     "claude-history-mcp": "dist/index.js"
@@ -13,6 +35,7 @@
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm test",
     "build-index": "tsx src/cli/build-index.ts",
     "install-hook": "tsx src/cli/install.ts"
   },

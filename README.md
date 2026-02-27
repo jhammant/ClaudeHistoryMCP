@@ -103,6 +103,23 @@ npm run install-hook
 
 This registers a `SessionStart` hook in `~/.claude/settings.json` that auto-injects project context, and installs the `/claude-history` skill.
 
+### 4. Add to your CLAUDE.md (recommended)
+
+Add the following to your global `~/.claude/CLAUDE.md` to ensure Claude proactively uses history tools:
+
+```markdown
+## Claude History MCP
+
+When the `claude-history` MCP is available, use it proactively:
+
+- **Session start**: Use `get_project_context` to check for prior decisions, patterns, and recent session summaries for the current project
+- **Debugging**: Use `find_solutions` to search history for past fixes before starting from scratch
+- **Context questions**: When the user asks "have we done X before", "what did we decide", or similar — use `search_history` to find relevant past conversations
+- **Patterns**: Use `find_patterns` to identify recurring workflows or issues when relevant
+```
+
+Without this, Claude has access to the tools but may not always think to reach for them.
+
 ## Usage
 
 ### Via MCP tools (automatic)
