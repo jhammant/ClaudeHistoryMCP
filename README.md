@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/jhammant-claudehistorymcp-badge.png)](https://mseep.ai/app/jhammant-claudehistorymcp)
+
 # Claude History MCP
 
 An MCP server that makes your Claude Code conversation history searchable and proactively useful. Indexes all past sessions with hybrid BM25 + TF-IDF search, extracts knowledge (decisions, solutions, error fixes), and auto-injects project context at session start.
