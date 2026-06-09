@@ -1,4 +1,5 @@
-import { parseHistoryFile, getProjectInfos } from "../parsers/history-parser.js";
+import { getProjectInfos } from "../parsers/history-parser.js";
+import { parseTranscriptHistory } from "../parsers/transcript-history.js";
 import { extractProjectName } from "../utils/path-encoder.js";
 
 export const listProjectsTool = {
@@ -18,7 +19,7 @@ export const listProjectsTool = {
 };
 
 export function handleListProjects(args: { sort_by?: string }): string {
-  const entries = parseHistoryFile();
+  const entries = parseTranscriptHistory();
   const infos = getProjectInfos(entries);
 
   if (infos.length === 0) {

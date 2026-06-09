@@ -1,4 +1,5 @@
-import { parseHistoryFile, groupBySession, getProjectInfos } from "../parsers/history-parser.js";
+import { groupBySession, getProjectInfos } from "../parsers/history-parser.js";
+import { parseTranscriptHistory } from "../parsers/transcript-history.js";
 import { extractProjectName } from "../utils/path-encoder.js";
 import type { SearchEngine } from "../search/search-engine.js";
 
@@ -35,7 +36,7 @@ export function handleGetProjectContext(
     return "Please provide a project name or path.";
   }
 
-  const entries = parseHistoryFile();
+  const entries = parseTranscriptHistory();
   const query = project.toLowerCase();
 
   const matching = entries.filter(
