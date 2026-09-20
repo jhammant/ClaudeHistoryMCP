@@ -6,9 +6,9 @@ import {
   type ParsedSession,
 } from "../parsers/session-parser.js";
 import {
-  parseHistoryFile,
   groupBySession,
 } from "../parsers/history-parser.js";
+import { parseTranscriptHistory } from "../parsers/transcript-history.js";
 import { extractProjectName } from "../utils/path-encoder.js";
 
 export const getSessionSummaryTool = {
@@ -72,7 +72,7 @@ function findSessionById(sessionId: string): ParsedSession | null {
 function findLatestSessionForProject(
   projectQuery: string
 ): ParsedSession | null {
-  const entries = parseHistoryFile();
+  const entries = parseTranscriptHistory();
   const query = projectQuery.toLowerCase();
 
   // Find matching project entries
@@ -88,14 +88,12 @@ function findLatestSessionForProject(
   const bySession = groupBySession(matching);
   let latestSessionId = "";
   let latestTimestamp = 0;
-  let latestProject = "";
 
   for (const [sessionId, sessionEntries] of bySession) {
     const maxTs = Math.max(...sessionEntries.map((e) => e.timestamp));
     if (maxTs > latestTimestamp) {
       latestTimestamp = maxTs;
       latestSessionId = sessionId;
-      latestProject = sessionEntries[0].project;
     }
   }
 

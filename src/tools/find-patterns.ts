@@ -1,8 +1,8 @@
 import {
-  parseHistoryFile,
   groupByProject,
   groupBySession,
 } from "../parsers/history-parser.js";
+import { parseTranscriptHistory } from "../parsers/transcript-history.js";
 import { extractProjectName } from "../utils/path-encoder.js";
 
 export const findPatternsTool = {
@@ -30,7 +30,7 @@ export function handleFindPatterns(args: {
   project?: string;
   type?: string;
 }): string {
-  const entries = parseHistoryFile();
+  const entries = parseTranscriptHistory();
   const patternType = args.type || "all";
 
   let filtered = entries;
